@@ -54,12 +54,11 @@ npm run mcp
 
 ## Ports
 
-| Port | Service |
+| Port / env | Service |
 |---|---|
-| **8080** | `llama-server` (engine). Reuses an existing healthy server (e.g. `llm-server`). |
-| **1321** | dottie-local HTTP façade |
-
-Overrides: `DOTTIE_LOCAL_ENGINE_PORT`, `DOTTIE_LOCAL_HTTP_PORT`, `DOTTIE_LOCAL_MODEL` / `LLM_MODEL`.
+| **8080** (`LLM_PORT` / `DOTTIE_LOCAL_ENGINE_PORT`) | `llama-server`. Reuses healthy server. |
+| **1321** (`DOTTIE_LOCAL_HTTP_PORT`) | dottie-local HTTP façade |
+| `LLM_REASON=1` | enable thinking on `ask` (default off) |
 
 ## HTTP
 

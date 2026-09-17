@@ -3,17 +3,15 @@
  * dottie-local CLI — ask / agent / start / health / stop
  *
  *   dottie-local ask "hello"
- *   dottie-local agent "search memory for my name"
- *   dottie-local start
- *   dottie-local health
- *   dottie-local stop
+ *   echo "doc" | dottie-local ask "summarize"
+ *   LLM_REASON=1 dottie-local /ask "think step by step"
  */
 
 import { pathToFileURL } from 'node:url';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { complete } from './core.js';
+import { complete, mergeAskPrompt } from './core.js';
 import { agentChat } from './agent.js';
 import { ensureEngineRunning, engineHealthPayload, stopEngine } from './engine.js';
 import { PORTS } from './ports.js';
@@ -24,8 +22,9 @@ function usage(code = 0) {
   const text = `dottie-local — local llama.cpp + optional dotbot harness
 
 Usage:
-  dottie-local ask <text>          One-shot completion (no tools)
+  dottie-local ask <text>          Stream completion (local-ai-cli ask parity)
   dottie-local /ask <text>         Same as ask
+  echo text | dottie-local ask "summarize"   # stdin appended to prompt
   dottie-local agent <text>        Agent turn with dot_* tools
   dottie-local /agent <text>       Same as agent
   dottie-local start               HTTP façade :${PORTS.HTTP_PORT} (+ engine :${PORTS.ENGINE_PORT})
@@ -34,9 +33,10 @@ Usage:
   dottie-local help
 
 Env:
-  DOTTIE_LOCAL_ENGINE_PORT   default ${PORTS.ENGINE_PORT}
-  DOTTIE_LOCAL_HTTP_PORT     default ${PORTS.HTTP_PORT}
+  DOTTIE_LOCAL_ENGINE_PORT / LLM_PORT   default ${PORTS.ENGINE_PORT}
+  DOTTIE_LOCAL_HTTP_PORT                default ${PORTS.HTTP_PORT}
   DOTTIE_LOCAL_MODEL / LLM_MODEL
+  LLM_REASON=1                          enable model thinking (default off)
 `;
   process.stderr.write(text);
   process.exit(code);
@@ -66,23 +66,37 @@ export function parseArgs(argv) {
   };
 }
 
+/** Read stdin when piped (not a TTY). */
+export async function readStdinIfPiped(stdin = process.stdin) {
+  if (stdin.isTTY) return '';
+  const chunks = [];
+  for await (const c of stdin) chunks.push(c);
+  return Buffer.concat(chunks).toString('utf8');
+}
+
 async function cmdAsk(text) {
-  if (!text.trim()) {
-    process.stderr.write('usage: dottie-local ask|/ask <text>\n');
+  const stdinText = await readStdinIfPiped();
+  const message = mergeAskPrompt(text, stdinText);
+  if (!message.trim()) {
+    process.stderr.write('usage: dottie-local ask|/ask <text>   (or pipe text in)\n');
     process.exit(1);
   }
   await ensureEngineRunning();
-  const result = await complete({ message: text });
+  const result = await complete({
+    message,
+    stream: true,
+    onDelta: (d) => process.stdout.write(d),
+  });
   if (result.error) {
     process.stderr.write(`${result.error}\n`);
     process.exit(1);
   }
-  process.stdout.write(`${result.text}\n`);
+  process.stdout.write('\n');
 }
 
 async function cmdAgent(text) {
   if (!text.trim()) {
-    process.stderr.write('usage: dottie-local agent <text>\n');
+    process.stderr.write('usage: dottie-local agent|/agent <text>\n');
     process.exit(1);
   }
   await ensureEngineRunning();
