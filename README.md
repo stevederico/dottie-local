@@ -35,9 +35,11 @@ npm install
 ```bash
 # Attach to an already-running llama-server on :8080, or spawn one
 dottie-local ask "hello"
+dottie-local /ask "hello"    # same
 
 # Agent turn (dotbot tools: memory, web, files, …)
 dottie-local agent "What tools do you have?"
+dottie-local /agent "…"      # same
 
 # HTTP façade
 dottie-local start          # http://127.0.0.1:1321
@@ -79,8 +81,8 @@ Overrides: `DOTTIE_LOCAL_ENGINE_PORT`, `DOTTIE_LOCAL_HTTP_PORT`, `DOTTIE_LOCAL_M
 ## CLI
 
 ```
-dottie-local ask <text>
-dottie-local agent <text>
+dottie-local ask|/ask <text>
+dottie-local agent|/agent <text>
 dottie-local start | health | stop | help
 ```
 

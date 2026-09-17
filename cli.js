@@ -25,7 +25,9 @@ function usage(code = 0) {
 
 Usage:
   dottie-local ask <text>          One-shot completion (no tools)
+  dottie-local /ask <text>         Same as ask
   dottie-local agent <text>        Agent turn with dot_* tools
+  dottie-local /agent <text>       Same as agent
   dottie-local start               HTTP façade :${PORTS.HTTP_PORT} (+ engine :${PORTS.ENGINE_PORT})
   dottie-local health
   dottie-local stop                Stop engine child this process started
@@ -40,12 +42,18 @@ Env:
   process.exit(code);
 }
 
+/** Strip leading slash so /ask and ask are the same command. */
+export function normalizeCmd(raw) {
+  if (typeof raw !== 'string' || !raw) return 'help';
+  return raw.startsWith('/') ? raw.slice(1) : raw;
+}
+
 /**
  * @param {string[]} argv
  */
 export function parseArgs(argv) {
   const args = argv.slice(2);
-  const cmd = args[0] || 'help';
+  const cmd = normalizeCmd(args[0] || 'help');
   const positionals = [];
   for (let i = 1; i < args.length; i++) {
     const a = args[i];
@@ -60,7 +68,7 @@ export function parseArgs(argv) {
 
 async function cmdAsk(text) {
   if (!text.trim()) {
-    process.stderr.write('usage: dottie-local ask <text>\n');
+    process.stderr.write('usage: dottie-local ask|/ask <text>\n');
     process.exit(1);
   }
   await ensureEngineRunning();
