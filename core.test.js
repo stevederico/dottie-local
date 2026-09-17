@@ -23,22 +23,10 @@ describe('parseArgs', () => {
     assert.equal(r.text, 'hello world');
   });
 
-  it('parses /ask as ask', () => {
-    const r = parseArgs(['node', 'cli.js', '/ask', 'hello']);
-    assert.equal(r.cmd, 'ask');
-    assert.equal(r.text, 'hello');
-  });
-
   it('parses agent', () => {
     const r = parseArgs(['node', 'cli.js', 'agent', 'do', 'stuff']);
     assert.equal(r.cmd, 'agent');
     assert.equal(r.text, 'do stuff');
-  });
-
-  it('parses /agent as agent', () => {
-    const r = parseArgs(['node', 'cli.js', '/agent', 'do']);
-    assert.equal(r.cmd, 'agent');
-    assert.equal(r.text, 'do');
   });
 
   it('defaults to help', () => {

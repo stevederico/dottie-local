@@ -1,3 +1,7 @@
+0.4.1
+
+  Remove /ask and /agent slash aliases
+
 0.4.0
 
   Ship ask and llm-server PATH bins

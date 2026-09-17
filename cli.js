@@ -4,7 +4,7 @@
  *
  *   dottie-local ask "hello"
  *   echo "doc" | dottie-local ask "summarize"
- *   LLM_REASON=1 dottie-local /ask "think step by step"
+ *   LLM_REASON=1 dottie-local ask "think step by step"
  */
 
 import { pathToFileURL } from 'node:url';
@@ -23,10 +23,8 @@ function usage(code = 0) {
 
 Usage:
   dottie-local ask <text>          Stream completion (local-ai-cli ask parity)
-  dottie-local /ask <text>         Same as ask
   echo text | dottie-local ask "summarize"   # stdin appended to prompt
   dottie-local agent <text>        Agent turn with dot_* tools
-  dottie-local /agent <text>       Same as agent
   dottie-local start               HTTP façade :${PORTS.HTTP_PORT} (+ engine :${PORTS.ENGINE_PORT})
   dottie-local health
   dottie-local stop                Stop engine child this process started
@@ -42,18 +40,12 @@ Env:
   process.exit(code);
 }
 
-/** Strip leading slash so /ask and ask are the same command. */
-export function normalizeCmd(raw) {
-  if (typeof raw !== 'string' || !raw) return 'help';
-  return raw.startsWith('/') ? raw.slice(1) : raw;
-}
-
 /**
  * @param {string[]} argv
  */
 export function parseArgs(argv) {
   const args = argv.slice(2);
-  const cmd = normalizeCmd(args[0] || 'help');
+  const cmd = args[0] || 'help';
   const positionals = [];
   for (let i = 1; i < args.length; i++) {
     const a = args[i];
@@ -78,7 +70,7 @@ async function cmdAsk(text) {
   const stdinText = await readStdinIfPiped();
   const message = mergeAskPrompt(text, stdinText);
   if (!message.trim()) {
-    process.stderr.write('usage: dottie-local ask|/ask <text>   (or pipe text in)\n');
+    process.stderr.write('usage: dottie-local ask <text>   (or pipe text in)\n');
     process.exit(1);
   }
   await ensureEngineRunning();
@@ -96,7 +88,7 @@ async function cmdAsk(text) {
 
 async function cmdAgent(text) {
   if (!text.trim()) {
-    process.stderr.write('usage: dottie-local agent|/agent <text>\n');
+    process.stderr.write('usage: dottie-local agent <text>\n');
     process.exit(1);
   }
   await ensureEngineRunning();

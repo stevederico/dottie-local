@@ -45,7 +45,6 @@ LLM_REASON=1 ask "prove it"
 llm-server start|stop|restart|status|log
 
 dottie-local agent "What tools do you have?"   # harness + dot_* tools
-dottie-local /ask "…"                          # same as ask
 dottie-local start                             # HTTP :1321
 dottie-local health
 ```
@@ -86,8 +85,8 @@ npm run mcp
 |---|---|
 | `ask <text>` | Stream completion (local-ai-cli drop-in) |
 | `llm-server …` | Manage warm engine (local-ai-cli drop-in) |
-| `dottie-local ask\|/ask` | Same as `ask` |
-| `dottie-local agent\|/agent` | Dotbot tools |
+| `dottie-local ask` | Same as `ask` |
+| `dottie-local agent` | Dotbot tools |
 | `dottie-local start\|health\|stop` | HTTP façade / status |
 
 `dottie-local stop` only kills an engine **this package spawned**. `llm-server stop` also matches `llama-server` on the engine port (full drop-in).
