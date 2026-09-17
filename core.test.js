@@ -13,6 +13,7 @@ import {
   sseContentDelta,
 } from './core.js';
 import { PORTS } from './ports.js';
+import { tagsFromOpenAIModels } from './http.js';
 import { LOCAL_TOOLS } from './mcp.js';
 import { main as llmServerMain } from './llm-server.js';
 
@@ -73,6 +74,26 @@ describe('ports', () => {
   it('exposes engine + http', () => {
     assert.equal(typeof PORTS.ENGINE_PORT, 'number');
     assert.equal(typeof PORTS.HTTP_PORT, 'number');
+  });
+
+  it('defaults http to 1318 when env unset', () => {
+    if (process.env.DOTTIE_LOCAL_HTTP_PORT) return;
+    assert.equal(PORTS.HTTP_PORT, 1318);
+  });
+});
+
+describe('tagsFromOpenAIModels', () => {
+  it('maps OpenAI data[].id to Ollama models[].name', () => {
+    assert.deepEqual(
+      tagsFromOpenAIModels({ data: [{ id: 'gemma' }, { id: 'qwen' }] }),
+      { models: [{ name: 'gemma' }, { name: 'qwen' }] },
+    );
+  });
+
+  it('returns empty models for bad/missing input', () => {
+    assert.deepEqual(tagsFromOpenAIModels(null), { models: [] });
+    assert.deepEqual(tagsFromOpenAIModels({}), { models: [] });
+    assert.deepEqual(tagsFromOpenAIModels({ data: [{ id: 1 }, {}] }), { models: [] });
   });
 });
 
