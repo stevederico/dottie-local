@@ -49,16 +49,22 @@ LLM_REASON=1 ask "prove it"
 llm-server start|stop|restart|status|log
 
 dottie-local agent "What tools do you have?"   # harness + dot_* tools
-dottie-local start                             # HTTP :1321
+dottie-local start                             # HTTP :1318
 dottie-local health
 ```
+
+## Use with dottie-desktop
+
+Point Settings Provider at **Dottie Local** (or set `localBaseUrl`). Base URL is the façade — not raw `:8080`:
+
+`http://127.0.0.1:1318` — needs `llama-server` on PATH + `dottie-local start`. Model list: `GET /api/tags`. Chat: `POST /v1/chat/completions`.
 
 ## Ports
 
 | Port / env | Service |
 |---|---|
 | **8080** (`LLM_PORT` / `DOTTIE_LOCAL_ENGINE_PORT`) | `llama-server`. Reuses healthy server. |
-| **1321** (`DOTTIE_LOCAL_HTTP_PORT`) | dottie-local HTTP façade |
+| **1318** (`DOTTIE_LOCAL_HTTP_PORT`) | dottie-local HTTP façade (desktop stack; mac-use owns `:1321`) |
 | `LLM_REASON=1` | enable thinking on `ask` (default off) |
 | `LLM_MODEL` / `DOTTIE_LOCAL_MODEL` | GGUF path or HF repo |
 
@@ -67,6 +73,7 @@ dottie-local health
 | Method | Path | Notes |
 |---|---|---|
 | `GET` | `/health` | Engine + façade |
+| `GET` | `/api/tags` | Ollama-shaped `{ models: [{ name }] }` for desktop |
 | `POST` | `/v1/local/complete` | Buffered `{ message }` → `{ text }` |
 | `POST` | `/v1/agent/chat` | Dotbot harness → `{ text, events }` |
 | `*` | `/v1/chat/completions` | Proxied to engine (SSE ok) |

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * dottie-local HTTP — owns/attaches llama-server, proxies OpenAI routes, agent endpoint.
- * Default: node http.js  →  127.0.0.1:1321
+ * Default: node http.js  →  127.0.0.1:1318
  */
 
 import http from 'node:http';
@@ -51,6 +51,26 @@ async function proxy(req, res, targetBase) {
 }
 
 /**
+ * Map OpenAI `/v1/models` JSON → Ollama `/api/tags` shape.
+ * @param {unknown} json
+ * @returns {{ models: { name: string }[] }}
+ */
+export function tagsFromOpenAIModels(json) {
+  /** @type {{ models: { name: string }[] }} */
+  const out = { models: [] };
+  const data = json && typeof json === 'object' && Array.isArray(/** @type {{ data?: unknown }} */ (json).data)
+    ? /** @type {{ data: unknown[] }} */ (json).data
+    : [];
+  for (const item of data) {
+    if (item && typeof item === 'object') {
+      const id = /** @type {{ id?: unknown }} */ (item).id;
+      if (typeof id === 'string' && id) out.models.push({ name: id });
+    }
+  }
+  return out;
+}
+
+/**
  * Handle one request. Exported for tests.
  * @param {import('node:http').IncomingMessage} req
  * @param {import('node:http').ServerResponse} res
@@ -67,6 +87,25 @@ export async function handleLocalRequest(req, res) {
         httpPort: PORTS.HTTP_PORT,
         ...engine,
       }));
+      return;
+    }
+
+    // Ollama-shaped model list for dottie-desktop / other Ollama clients
+    if (req.method === 'GET' && url.pathname === '/api/tags') {
+      try {
+        await ensureEngineRunning();
+      } catch { /* honest empty list below */ }
+      let out = { models: [] };
+      try {
+        const upstream = await fetch(`${engineBaseUrl()}/v1/models`, {
+          signal: AbortSignal.timeout(5_000),
+        });
+        if (upstream.ok) {
+          out = tagsFromOpenAIModels(await upstream.json());
+        }
+      } catch { /* empty */ }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(out));
       return;
     }
 

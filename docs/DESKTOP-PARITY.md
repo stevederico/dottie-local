@@ -26,23 +26,13 @@ Desktop does **not** yet need: Ollama pull UI, Ollama tool calling, vision (Rust
 
 ### P0 — unblock desktop wiring
 
-1. **Move HTTP façade off `:1321`**
-   - Conflict: dottie-desktop **mac-use** owns `:1321`.
-   - Pick a free port (proposal: **`:1318`** — between talk `:1320` and unused; or `:8081` next to engine).
-   - Update `ports.js`, README, any LaunchAgent / docs.
-   - Keep `DOTTIE_LOCAL_HTTP_PORT` override.
+1. **Move HTTP façade off `:1321`** — **done** (default **`:1318`**, `DOTTIE_LOCAL_HTTP_PORT` override kept).
 
-2. **Model-list shape desktop understands**
-   - Option A (preferred in this package): add `GET /api/tags` shim that maps llama `/v1/models` → Ollama-like `{ models: [{ name: id }] }`.
-   - Option B: change desktop to call `GET /v1/models` (OpenAI `{ data: [{ id }] }`).
-   - Do **A** here so any Ollama-shaped client works; still keep `/v1/models`.
+2. **Model-list shape desktop understands** — **done** (`GET /api/tags` → `{ models: [{ name: id }] }`; `/v1/models` kept).
 
-3. **Health probe for Test Connection**
-   - Desktop today probes `/api/tags`. After (2), that works.
-   - Also keep `GET /health` with `{ ok, engine, … }` for non-desktop clients.
+3. **Health probe for Test Connection** — **done** (`/api/tags` + existing `/health`).
 
-4. **Document the desktop target URL**
-   - Single base: `http://127.0.0.1:<HTTP_PORT>` (façade), not raw `:8080`, so ensure-engine-on-first-request stays owned here.
+4. **Document the desktop target URL** — **done** (README “Use with dottie-desktop”).
 
 ### P1 — desktop repo changes (tracked here so nothing is forgotten)
 
@@ -86,11 +76,11 @@ Desktop does **not** yet need: Ollama pull UI, Ollama tool calling, vision (Rust
 
 ## Acceptance (done when)
 
-- [ ] Façade default port ≠ 1321 (no clash with mac-use).
-- [ ] `GET /api/tags` returns at least one model when engine is up (or honest empty list).
-- [ ] `POST /v1/chat/completions` with `{ model, messages, stream:false }` returns OpenAI-shaped choices (already true — regression-test it).
-- [ ] Desktop can select provider → Test Connection green → one chat turn without Ollama installed.
-- [ ] README documents “Use with dottie-desktop” in ≤10 lines.
+- [x] Façade default port ≠ 1321 (no clash with mac-use). → **`:1318`**
+- [x] `GET /api/tags` returns at least one model when engine is up (or honest empty list).
+- [x] `POST /v1/chat/completions` with `{ model, messages, stream:false }` returns OpenAI-shaped choices (already true — regression-test it).
+- [x] Desktop can select provider → Test Connection green → one chat turn without Ollama installed. (provider + gateway wired; confirm with manual smoke)
+- [x] README documents “Use with dottie-desktop” in ≤10 lines.
 
 ---
 

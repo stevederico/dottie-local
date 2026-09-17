@@ -1,3 +1,10 @@
+0.5.0
+
+  Move HTTP façade to :1318
+  Add Ollama-shaped /api/tags
+  Document dottie-desktop base URL
+
+
 0.4.2
 
   Add desktop Ollama parity plan
