@@ -5,7 +5,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { parseArgs } from './cli.js';
-import { resolveModelArgs } from './engine.js';
+import { resolveModelArgs, stopEngineForce, engineLogPath } from './engine.js';
 import {
   complete,
   mergeAskPrompt,
@@ -14,6 +14,7 @@ import {
 } from './core.js';
 import { PORTS } from './ports.js';
 import { LOCAL_TOOLS } from './mcp.js';
+import { main as llmServerMain } from './llm-server.js';
 
 describe('parseArgs', () => {
   it('parses ask text', () => {
@@ -169,5 +170,34 @@ describe('LOCAL_TOOLS', () => {
     const names = LOCAL_TOOLS.map((t) => t.name);
     assert.ok(names.includes('complete'));
     assert.ok(names.includes('agent'));
+  });
+});
+
+describe('engine helpers', () => {
+  it('exposes log path', () => {
+    assert.ok(engineLogPath().includes('dottie-local'));
+  });
+
+  it('stopEngineForce returns a status string', () => {
+    const r = stopEngineForce();
+    assert.ok(r === 'stopped' || r === 'not running');
+  });
+});
+
+describe('llm-server main', () => {
+  it('rejects unknown command', async () => {
+    const prev = process.exitCode;
+    let code;
+    const realExit = process.exit;
+    process.exit = (c) => { code = c; throw new Error('exit'); };
+    try {
+      await llmServerMain(['node', 'llm-server.js', 'nope']);
+    } catch (err) {
+      assert.equal(err.message, 'exit');
+    } finally {
+      process.exit = realExit;
+      process.exitCode = prev;
+    }
+    assert.equal(code, 1);
   });
 });

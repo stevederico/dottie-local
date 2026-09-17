@@ -1,3 +1,9 @@
+0.4.0
+
+  Ship ask and llm-server PATH bins
+  Replace local-ai-cli LLM half
+  Force-stop engine by port for llm-server
+
 0.3.0
 
   ask parity with local-ai-cli

@@ -211,6 +211,14 @@ export async function engineHealthPayload(fetchFn = globalThis.fetch) {
   return payload;
 }
 
+export function engineLogPath() {
+  return LOG;
+}
+
+export function enginePidPath() {
+  return PIDF;
+}
+
 /**
  * Stop only an engine this process spawned (pid file). Never pkill a shared server.
  */
@@ -235,4 +243,32 @@ export function stopEngine() {
   }
   log('no child engine to stop (shared server left running)');
   return false;
+}
+
+/**
+ * Drop-in llm-server stop: pid file, then match llama-server on ENGINE_PORT.
+ * @returns {'stopped' | 'not running'}
+ */
+export function stopEngineForce() {
+  let stopped = false;
+  if (child && !child.killed) {
+    child.kill('SIGTERM');
+    child = null;
+    stopped = true;
+  }
+  if (existsSync(PIDF)) {
+    const pid = Number(readFileSync(PIDF, 'utf8').trim());
+    if (pid > 0) {
+      try {
+        process.kill(pid, 'SIGTERM');
+        stopped = true;
+      } catch { /* already gone */ }
+    }
+    try { unlinkSync(PIDF); } catch { /* ok */ }
+  }
+  try {
+    execSync(`pkill -f "llama-server .*--port ${PORTS.ENGINE_PORT}"`, { stdio: 'ignore' });
+    stopped = true;
+  } catch { /* no match */ }
+  return stopped ? 'stopped' : 'not running';
 }

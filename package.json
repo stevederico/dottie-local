@@ -1,9 +1,9 @@
 {
   "name": "dottie-local",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "license": "MIT",
   "type": "module",
-  "description": "Local llama.cpp inference + optional dotbot harness via HTTP, MCP, and CLI",
+  "description": "Local llama.cpp inference + optional dotbot harness via HTTP, MCP, and CLI — replaces local-ai-cli ask/llm-server",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/stevederico/dottie-local.git"
@@ -25,7 +25,9 @@
     "./ports.js": "./ports.js"
   },
   "bin": {
-    "dottie-local": "./cli.js"
+    "dottie-local": "./cli.js",
+    "ask": "./ask.js",
+    "llm-server": "./llm-server.js"
   },
   "scripts": {
     "start": "node http.js",
