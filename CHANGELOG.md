@@ -1,3 +1,8 @@
+0.6.0
+
+  Remove desktop parity plan doc
+
+
 0.5.0
 
   Move HTTP façade to :1318

@@ -1,6 +1,6 @@
 {
   "name": "dottie-local",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "license": "MIT",
   "type": "module",
   "description": "Local llama.cpp inference + optional dotbot harness via HTTP, MCP, and CLI — replaces local-ai-cli ask/llm-server",
