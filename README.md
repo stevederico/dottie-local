@@ -36,6 +36,8 @@ npm install
 # Attach to an already-running llama-server on :8080, or spawn one
 dottie-local ask "hello"
 dottie-local /ask "hello"    # same
+echo "$(cat article.txt)" | dottie-local ask "summarize this"
+LLM_REASON=1 dottie-local ask "prove it"   # gemma thinking on
 
 # Agent turn (dotbot tools: memory, web, files, …)
 dottie-local agent "What tools do you have?"
@@ -45,6 +47,8 @@ dottie-local /agent "…"      # same
 dottie-local start          # http://127.0.0.1:1321
 dottie-local health
 ```
+
+`ask` matches [local-ai-cli](https://github.com/stevederico/local-ai-cli): warm server, SSE stream to stdout, stdin append, `LLM_REASON`.
 
 MCP:
 
