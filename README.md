@@ -6,7 +6,7 @@ Local **llama.cpp** inference + optional **[dotbot](https://github.com/stevederi
 
 Same product shape as dottie-talk: HTTP + MCP + CLI. Talk is voice; this is tokens.
 
-Private for now. Written as if it will be public (MIT, no secrets, clear docs).
+MIT. Public.
 
 ## What it is
 
