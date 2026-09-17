@@ -8,6 +8,10 @@ Same product shape as dottie-talk: HTTP + MCP + CLI. Talk is voice; this is toke
 
 MIT. Public.
 
+## Docs
+
+- [Desktop parity plan](docs/DESKTOP-PARITY.md) — what it takes to replace Ollama in dottie-desktop
+
 ## What it is
 
 | Layer | Role |

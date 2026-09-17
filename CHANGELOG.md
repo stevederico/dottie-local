@@ -1,3 +1,8 @@
+0.4.2
+
+  Add desktop Ollama parity plan
+
+
 0.4.1
 
   Remove /ask and /agent slash aliases
