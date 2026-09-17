@@ -1,0 +1,49 @@
+{
+  "name": "dottie-local",
+  "version": "0.1.0",
+  "license": "MIT",
+  "type": "module",
+  "description": "Local llama.cpp inference + optional dotbot harness via HTTP, MCP, and CLI",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stevederico/dottie-local.git"
+  },
+  "bugs": {
+    "url": "https://github.com/stevederico/dottie-local/issues"
+  },
+  "homepage": "https://github.com/stevederico/dottie-local#readme",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "exports": {
+    ".": "./core.js",
+    "./core.js": "./core.js",
+    "./engine.js": "./engine.js",
+    "./agent.js": "./agent.js",
+    "./http.js": "./http.js",
+    "./mcp.js": "./mcp.js",
+    "./ports.js": "./ports.js"
+  },
+  "bin": {
+    "dottie-local": "./cli.js"
+  },
+  "scripts": {
+    "start": "node http.js",
+    "cli": "node cli.js",
+    "mcp": "node mcp.js",
+    "http": "node http.js",
+    "test": "node --test core.test.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "@stevederico/dotbot": "github:stevederico/dotbot#0.42.0"
+  },
+  "keywords": [
+    "llama.cpp",
+    "llm",
+    "local",
+    "mcp",
+    "dotbot",
+    "openai-compatible"
+  ]
+}
